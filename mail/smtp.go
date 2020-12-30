@@ -28,7 +28,9 @@ func (s *SMTP) Delivery(mail *Mail, content []byte) error {
 
 	addr := s.Address()
 	auth := s.Auth()
-	err := smtp.SendMail(addr, auth, mail.From, []string{mail.To}, content)
+	to := []string{mail.To}
+
+	err := smtp.SendMail(addr, auth, mail.From.Email, to, content)
 
 	if err != nil {
 		return err

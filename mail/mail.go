@@ -4,84 +4,84 @@ import (
 	"bytes"
 	"fmt"
 	"text/template"
-	"time"
-
-	"github.com/mateussouzaweb/x/env"
 )
+
+// From struct
+type From struct {
+	Email string
+	Name  string
+}
 
 // Data type
 type Data = map[string]interface{}
 
 // Mail struct
 type Mail struct {
-	From     string
-	FromName string
+	From     From
 	To       string
 	ReplyTo  string
 	Subject  string
+	HTML     bool
 	Message  string
 	Template string
 	Data     Data
 }
 
-// FillMissing method
-func (m *Mail) FillMissing() {
+// Fill method
+func (m *Mail) Fill() {
 
-	if m.From == "" {
-		m.From = env.Get("MAIL_FROM", "")
+	if m.From.Name == "" {
+		m.From.Name = _config.From.Name
 	}
-	if m.FromName == "" {
-		m.FromName = env.Get("MAIL_FROM_NAME", "")
+	if m.From.Email == "" {
+		m.From.Email = _config.From.Email
 	}
 	if m.ReplyTo == "" {
-		m.ReplyTo = m.From
+		m.ReplyTo = m.From.Email
 	}
 
-	if m.Template != "" {
-		m.Data["appName"] = env.Get("APP_NAME", "")
-		m.Data["year"] = time.Now().Format("2006")
+	for key, value := range _config.Data {
+		m.Data[key] = value
 	}
 
 }
 
-// DeliveryPlain method
-func (m *Mail) DeliveryPlain() error {
+// Delivery method
+func (m *Mail) Delivery() error {
 
-	m.FillMissing()
+	m.Fill()
 
-	var content = fmt.Sprintf("To: %s\r\n"+
-		"From: %s <%s>\r\n"+
-		"Reply-To: %s\r\n"+
-		"Subject: %s\r\n"+
-		"\r\n"+
-		"%s\r\n", m.To, m.FromName, m.From, m.ReplyTo, m.Subject, m.Message)
+	var tmpl *template.Template
+	var err error
 
-	return connection.Delivery(m, []byte(content))
-}
-
-// DeliveryHTML method
-func (m *Mail) DeliveryHTML() error {
-
-	m.FillMissing()
-
-	tmpl, err := template.ParseFiles(m.Template)
+	if m.HTML {
+		tmpl, err = template.ParseFiles(m.Template)
+	} else {
+		tmpl, err = template.New("plain").Parse(m.Message)
+	}
 
 	if err != nil {
 		return err
 	}
 
-	var content = fmt.Sprintf("To: %s\r\n"+
+	content := fmt.Sprintf("To: %s\r\n"+
 		"From: %s <%s>\r\n"+
 		"Reply-To: %s\r\n"+
-		"Subject: %s\r\n"+
-		"MIME-version: 1.1\r\n"+
-		"Content-Type: text/html; charset=\"UTF-8\"\r\n"+
-		"\r\n", m.To, m.FromName, m.From, m.ReplyTo, m.Subject)
+		"Subject: %s\r\n",
+		m.To, m.From.Name, m.From.Email, m.ReplyTo, m.Subject)
+
+	if m.HTML {
+		content += "MIME-version: 1.1\r\n" +
+			"Content-Type: text/html; charset=\"UTF-8\"\r\n" +
+			"\r\n"
+	} else {
+		content += "\r\n"
+	}
 
 	var body bytes.Buffer
 
 	body.Write([]byte(content))
 	tmpl.Execute(&body, m.Data)
 
-	return connection.Delivery(m, body.Bytes())
+	return _config.SMTP.Delivery(m, body.Bytes())
 }
