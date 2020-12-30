@@ -8,11 +8,10 @@ import (
 	"math/rand"
 )
 
-// EncryptString encode a string with the private key.
-// See SetPrivateKey(key)
+// EncryptString encode a string with the private key
 func EncryptString(content string) (string, error) {
 
-	key, err := hex.DecodeString(privateKey)
+	key, err := hex.DecodeString(_config.PrivateKey)
 
 	if err != nil {
 		return "", err
@@ -43,11 +42,10 @@ func EncryptString(content string) (string, error) {
 	return encrypted, nil
 }
 
-// DecryptString decode a string with the private key.
-// See SetPrivateKey(key)
+// DecryptString decode a string with the private key
 func DecryptString(encrypted string) (string, error) {
 
-	key, err := hex.DecodeString(privateKey)
+	key, err := hex.DecodeString(_config.PrivateKey)
 
 	if err != nil {
 		return "", err
