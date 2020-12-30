@@ -9,14 +9,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-// MongoDB struct
-type MongoDB struct {
+var _client *Client
+var _database *Database
+var _config *Config
+
+// Config struct
+type Config struct {
 	URI      string
 	Database string
 }
-
-var _client *Client
-var _database *Database
 
 // Context method
 func Context(timeout time.Duration) (context.Context, context.CancelFunc) {
@@ -24,7 +25,7 @@ func Context(timeout time.Duration) (context.Context, context.CancelFunc) {
 }
 
 // Connect method
-func Connect(config *MongoDB) error {
+func Connect(config *Config) error {
 
 	clientOptions := options.Client().ApplyURI(config.URI)
 	client, err := mongo.NewClient(clientOptions)
@@ -56,6 +57,7 @@ func Connect(config *MongoDB) error {
 
 	_client = client
 	_database = client.Database(config.Database)
+	_config = config
 
 	return nil
 }
