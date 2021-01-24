@@ -51,7 +51,7 @@ func Count(document Document, filters *Array, options *CountOptions) (int64, err
 }
 
 // Aggregate method
-func Aggregate(results interface{}, document Document, pipeline *Array, options *AggregateOptions) error {
+func Aggregate(results interface{}, document Document, pipeline *Pipeline, options *AggregateOptions) error {
 
 	ctx, cancel := Context(10 * time.Second)
 	defer cancel()

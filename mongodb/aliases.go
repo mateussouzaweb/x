@@ -25,6 +25,9 @@ type Item = bson.E
 // Map struct
 type Map = bson.M
 
+// Pipeline struct
+type Pipeline = []Array
+
 // Regex struct
 type Regex = primitive.Regex
 
