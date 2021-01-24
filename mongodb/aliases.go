@@ -31,6 +31,12 @@ type Regex = primitive.Regex
 // Options struct
 type Options = options.FindOptions
 
+// CountOptions struct
+type CountOptions = options.CountOptions
+
+// AggregateOptions struct
+type AggregateOptions = options.AggregateOptions
+
 // Collation struct
 type Collation = options.Collation
 

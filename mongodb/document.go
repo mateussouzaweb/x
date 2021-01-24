@@ -38,6 +38,38 @@ func Find(results interface{}, document Document, filters *Array, options *Optio
 	return nil
 }
 
+// Count method
+func Count(document Document, filters *Array, options *CountOptions) (int64, error) {
+
+	ctx, cancel := Context(10 * time.Second)
+	defer cancel()
+
+	collection := document.TheCollection()
+	count, err := collection.CountDocuments(ctx, filters, options)
+
+	return count, err
+}
+
+// Aggregate method
+func Aggregate(results interface{}, document Document, pipeline *Array, options *AggregateOptions) error {
+
+	ctx, cancel := Context(10 * time.Second)
+	defer cancel()
+
+	collection := document.TheCollection()
+	cursor, err := collection.Aggregate(ctx, pipeline, options)
+
+	if err != nil {
+		return err
+	}
+
+	if err := cursor.All(ctx, results); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // Retrieve method
 func Retrieve(document Document, filters *Array) error {
 
