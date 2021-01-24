@@ -19,16 +19,34 @@ func (v *Validate) PresenceOfInt(name string, value int64) {
 	v.Validate(cond, "%s cannot be blank or zero", name)
 }
 
+// PresenceOfNegativeInt validates presence of int field
+func (v *Validate) PresenceOfNegativeInt(name string, value int64) {
+	cond := value < 0
+	v.Validate(cond, "%s cannot be blank or more than zero", name)
+}
+
 // PresenceOfFloat validates presence of float field
 func (v *Validate) PresenceOfFloat(name string, value float64) {
 	cond := value > 0
 	v.Validate(cond, "%s cannot be blank or zero", name)
 }
 
+// PresenceOfNegativeFloat validates presence of float field
+func (v *Validate) PresenceOfNegativeFloat(name string, value float64) {
+	cond := value < 0
+	v.Validate(cond, "%s cannot be blank or more than zero", name)
+}
+
 // PresenceOfTime validates presence of time field
 func (v *Validate) PresenceOfTime(name string, value time.Time) {
 	cond := value.IsZero() != true
 	v.Validate(cond, "%s cannot be blank or have a empty datetime", name)
+}
+
+// PresenceOfSlice validates presence of slice field
+func (v *Validate) PresenceOfSlice(name string, value []interface{}) {
+	cond := len(value) > 0
+	v.Validate(cond, "%s cannot be empty", name)
 }
 
 // MaxLength validates maximum character length of string field
