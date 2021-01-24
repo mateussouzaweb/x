@@ -57,7 +57,7 @@ func Aggregate(results interface{}, document Document, pipeline *Array, options 
 	defer cancel()
 
 	collection := document.TheCollection()
-	cursor, err := collection.Aggregate(ctx, pipeline, options)
+	cursor, err := collection.Aggregate(ctx, *pipeline, options)
 
 	if err != nil {
 		return err
