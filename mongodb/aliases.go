@@ -22,6 +22,9 @@ type Array = bson.D
 // Item struct
 type Item = bson.E
 
+// List struct
+type List = bson.A
+
 // Map struct
 type Map = bson.M
 
