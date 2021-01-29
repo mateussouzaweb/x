@@ -3,6 +3,7 @@ package mail
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"text/template"
 )
 
@@ -17,14 +18,12 @@ type Data = map[string]interface{}
 
 // Mail struct
 type Mail struct {
-	From     From
-	To       string
-	ReplyTo  string
-	Subject  string
-	HTML     bool
-	Message  string
-	Template string
-	Data     Data
+	From    From
+	To      string
+	ReplyTo string
+	Subject string
+	Message string
+	Data    Data
 }
 
 // Fill method
@@ -54,23 +53,20 @@ func (m *Mail) Delivery() error {
 	var tmpl *template.Template
 	var err error
 
-	if m.HTML {
-		tmpl, err = template.ParseFiles(m.Template)
-	} else {
-		tmpl, err = template.New("plain").Parse(m.Message)
-	}
+	tmpl, err = template.New("plain").Parse(m.Message)
 
 	if err != nil {
 		return err
 	}
 
+	isHTML := strings.Contains(m.Message, "</p>")
 	content := fmt.Sprintf("To: %s\r\n"+
 		"From: %s <%s>\r\n"+
 		"Reply-To: %s\r\n"+
 		"Subject: %s\r\n",
 		m.To, m.From.Name, m.From.Email, m.ReplyTo, m.Subject)
 
-	if m.HTML {
+	if isHTML {
 		content += "MIME-version: 1.1\r\n" +
 			"Content-Type: text/html; charset=\"UTF-8\"\r\n" +
 			"\r\n"
