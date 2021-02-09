@@ -2,9 +2,9 @@ package mongodb
 
 import (
 	"strings"
-	"time"
 
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // Document interface
@@ -18,62 +18,10 @@ func UUID() string {
 	return strings.ReplaceAll(uuid.New().String(), "-", "")
 }
 
-// Find method
-func Find(results interface{}, document Document, filters *Array, options *Options) error {
-
-	ctx, cancel := Context(10 * time.Second)
-	defer cancel()
-
-	collection := document.TheCollection()
-	cursor, err := collection.Find(ctx, filters, options)
-
-	if err != nil {
-		return err
-	}
-
-	if err := cursor.All(ctx, results); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Count method
-func Count(document Document, filters *Array, options *CountOptions) (int64, error) {
-
-	ctx, cancel := Context(10 * time.Second)
-	defer cancel()
-
-	collection := document.TheCollection()
-	count, err := collection.CountDocuments(ctx, filters, options)
-
-	return count, err
-}
-
-// Aggregate method
-func Aggregate(results interface{}, document Document, pipeline *Pipeline, options *AggregateOptions) error {
-
-	ctx, cancel := Context(10 * time.Second)
-	defer cancel()
-
-	collection := document.TheCollection()
-	cursor, err := collection.Aggregate(ctx, *pipeline, options)
-
-	if err != nil {
-		return err
-	}
-
-	if err := cursor.All(ctx, results); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // Retrieve method
 func Retrieve(document Document, filters *Array) error {
 
-	ctx, cancel := Context(10 * time.Second)
+	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
 
 	collection := document.TheCollection()
@@ -97,10 +45,13 @@ func RetrieveByUUID(document Document, uuid *string) error {
 	return RetrieveBy(document, "uuid", uuid)
 }
 
-// Create method
-func Create(document Document) (*InsertResult, error) {
+// CreateResult struct
+type CreateResult = mongo.InsertOneResult
 
-	ctx, cancel := Context(5 * time.Second)
+// Create method
+func Create(document Document) (*CreateResult, error) {
+
+	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
 
 	collection := document.TheCollection()
@@ -109,10 +60,13 @@ func Create(document Document) (*InsertResult, error) {
 	return result, err
 }
 
+// UpdateResult struct
+type UpdateResult = mongo.UpdateResult
+
 // Update method
 func Update(document Document) (*UpdateResult, error) {
 
-	ctx, cancel := Context(5 * time.Second)
+	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
 
 	collection := document.TheCollection()
@@ -129,10 +83,13 @@ func Update(document Document) (*UpdateResult, error) {
 	return result, err
 }
 
+// DeleteResult struct
+type DeleteResult = mongo.DeleteResult
+
 // Delete method
 func Delete(document Document) (*DeleteResult, error) {
 
-	ctx, cancel := Context(5 * time.Second)
+	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
 
 	collection := document.TheCollection()

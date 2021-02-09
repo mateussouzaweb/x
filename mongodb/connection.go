@@ -15,13 +15,18 @@ var _config *Config
 
 // Config struct
 type Config struct {
-	URI      string
-	Database string
+	URI                  string
+	Database             string
+	OperationTimeout     int64
+	MassOperationTimeout int64
 }
 
 // Context method
-func Context(timeout time.Duration) (context.Context, context.CancelFunc) {
-	return context.WithTimeout(context.Background(), timeout)
+func Context(timeout int64) (context.Context, context.CancelFunc) {
+	return context.WithTimeout(
+		context.Background(),
+		time.Duration(timeout)*time.Second,
+	)
 }
 
 // Connect method
@@ -34,7 +39,7 @@ func Connect(config *Config) error {
 		return err
 	}
 
-	ctx, cancel := Context(10 * time.Second)
+	ctx, cancel := Context(config.OperationTimeout)
 	defer cancel()
 
 	err = client.Connect(ctx)

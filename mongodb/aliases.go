@@ -16,14 +16,16 @@ type Database = mongo.Database
 // Collection struct
 type Collection = mongo.Collection
 
+// == REPRESENTATIONS ==
+
+// List struct
+type List = bson.A
+
 // Array struct
 type Array = bson.D
 
 // Item struct
 type Item = bson.E
-
-// List struct
-type List = bson.A
 
 // Map struct
 type Map = bson.M
@@ -31,26 +33,42 @@ type Map = bson.M
 // Pipeline struct
 type Pipeline = []Array
 
+// == PRIMITIVES ==
+
+// Binary struct
+type Binary = primitive.Binary
+
+// DateTime struct
+type DateTime = primitive.DateTime
+
+// Decimal128 struct
+type Decimal128 = primitive.Decimal128
+
+// JavaScript struct
+type JavaScript = primitive.JavaScript
+
+// MaxKey struct
+type MaxKey = primitive.MaxKey
+
+// MinKey struct
+type MinKey = primitive.MinKey
+
+// Null struct
+type Null = primitive.Null
+
+// ObjectID struct
+type ObjectID = primitive.ObjectID
+
 // Regex struct
 type Regex = primitive.Regex
 
-// Options struct
-type Options = options.FindOptions
+// Timestamp struct
+type Timestamp = primitive.Timestamp
 
-// CountOptions struct
-type CountOptions = options.CountOptions
-
-// AggregateOptions struct
-type AggregateOptions = options.AggregateOptions
+// == OPTIONS ==
 
 // Collation struct
 type Collation = options.Collation
 
-// InsertResult struct
-type InsertResult = mongo.InsertOneResult
-
-// UpdateResult struct
-type UpdateResult = mongo.UpdateResult
-
-// DeleteResult struct
-type DeleteResult = mongo.DeleteResult
+// CursorType struct
+type CursorType = options.CursorType
