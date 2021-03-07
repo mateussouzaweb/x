@@ -7,107 +7,128 @@ import (
 	"time"
 )
 
-// PresenceOf validates presence of string field
-func (v *Validate) PresenceOf(name string, value string) {
-	cond := len(strings.TrimSpace(value)) > 0
-	v.Validate(cond, "%s cannot be blank", name)
+// String validates presence of string field
+func (v *Validate) String(key string, value string, message string) {
+	condition := len(strings.TrimSpace(value)) > 0
+	v.Validate(key, condition, message, key, value)
 }
 
-// PresenceOfInt validates presence of int field
-func (v *Validate) PresenceOfInt(name string, value int64) {
-	cond := value > 0
-	v.Validate(cond, "%s cannot be blank or zero", name)
+// Int validates presence of int field
+func (v *Validate) Int(key string, value int64, message string) {
+	condition := value > 0
+	v.Validate(key, condition, message, key, value)
 }
 
-// PresenceOfNegativeInt validates presence of int field
-func (v *Validate) PresenceOfNegativeInt(name string, value int64) {
-	cond := value < 0
-	v.Validate(cond, "%s cannot be blank or more than zero", name)
+// NegativeInt validates presence of int field
+func (v *Validate) NegativeInt(key string, value int64, message string) {
+	condition := value < 0
+	v.Validate(key, condition, message, key, value)
 }
 
-// PresenceOfFloat validates presence of float field
-func (v *Validate) PresenceOfFloat(name string, value float64) {
-	cond := value > 0
-	v.Validate(cond, "%s cannot be blank or zero", name)
+// Float validates presence of float field
+func (v *Validate) Float(key string, value float64, message string) {
+	condition := value > 0
+	v.Validate(key, condition, message, key, value)
 }
 
-// PresenceOfNegativeFloat validates presence of float field
-func (v *Validate) PresenceOfNegativeFloat(name string, value float64) {
-	cond := value < 0
-	v.Validate(cond, "%s cannot be blank or more than zero", name)
+// NegativeFloat validates presence of float field
+func (v *Validate) NegativeFloat(key string, value float64, message string) {
+	condition := value < 0
+	v.Validate(key, condition, message, key, value)
 }
 
-// PresenceOfTime validates presence of time field
-func (v *Validate) PresenceOfTime(name string, value time.Time) {
-	cond := value.IsZero() != true
-	v.Validate(cond, "%s cannot be blank or have a empty datetime", name)
+// Time validates presence of time field
+func (v *Validate) Time(key string, value time.Time, message string) {
+	condition := value.IsZero() != true
+	v.Validate(key, condition, message, key, value)
 }
 
-// PresenceOfSlice validates presence of slice field
-func (v *Validate) PresenceOfSlice(name string, value []interface{}) {
-	cond := len(value) > 0
-	v.Validate(cond, "%s cannot be empty", name)
+// Slice validates presence of slice field
+func (v *Validate) Slice(key string, value []interface{}, message string) {
+	condition := len(value) > 0
+	v.Validate(key, condition, message, key, value)
+}
+
+// Map validates presence of map field
+func (v *Validate) Map(key string, value map[interface{}]interface{}, message string) {
+	condition := len(value) > 0
+	v.Validate(key, condition, message, key, value)
+}
+
+// Length validates character length of string field
+func (v *Validate) Length(key string, value string, exact int, message string) {
+	condition := len(value) == exact
+	v.Validate(key, condition, message, key, exact, value)
 }
 
 // MaxLength validates maximum character length of string field
-func (v *Validate) MaxLength(name string, value string, max int) {
-	cond := len(value) < max
-	v.Validate(cond, "%s cannot be greater than %d characters", name, max)
+func (v *Validate) MaxLength(key string, value string, max int, message string) {
+	condition := len(value) <= max
+	v.Validate(key, condition, message, key, max, value)
 }
 
 // MinLength validates minimum character length of string field
-func (v *Validate) MinLength(name string, value string, min int) {
-	cond := len(value) > min
-	v.Validate(cond, "%s must be at least %d characters", name, min)
+func (v *Validate) MinLength(key string, value string, min int, message string) {
+	condition := len(value) >= min
+	v.Validate(key, condition, message, key, min, value)
 }
 
 // Email validates if email is valid
-func (v *Validate) Email(name string, value string) {
+func (v *Validate) Email(key string, value string, message string) {
 
 	regex := regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
-	match := regex.MatchString(value)
+	condition := regex.MatchString(value)
 
-	v.Validate(match, "%s is not in valid email address", name)
+	v.Validate(key, condition, message, key, value)
 }
 
 // Domain validates if domain is valid
-func (v *Validate) Domain(name string, value string) {
+func (v *Validate) Domain(key string, value string, message string) {
 
 	regex := regexp.MustCompile(`^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-z0-9])?\.)+(?:[a-zA-Z]{1,63}| xn--[a-z0-9]{1,59})$`)
-	match := regex.MatchString(value)
+	condition := regex.MatchString(value)
 
-	v.Validate(match, "%s is not in valid domain", name)
+	v.Validate(key, condition, message, key, value)
 }
 
 // IP validates if string in a valid IPV4 or IPV6
-func (v *Validate) IP(name string, value string) {
+func (v *Validate) IP(key string, value string, message string) {
 
 	ip := net.ParseIP(value)
-	cond := ip != nil
+	condition := ip != nil
 
-	v.Validate(cond, "%s must be a valid IPV4 or IPV6 address", name)
+	v.Validate(key, condition, message, key, value)
 }
 
 // IPV4 validates if string in a valid IPV4
-func (v *Validate) IPV4(name string, value string) {
+func (v *Validate) IPV4(key string, value string, message string) {
 
 	ip := net.ParseIP(value)
-	cond := ip != nil && len(ip) == 4
+	condition := ip != nil && len(ip) == 4
 
-	v.Validate(cond, "%s must be a valid IPV4 address", name)
+	v.Validate(key, condition, message, key, value)
 }
 
 // IPV6 validates if string in a valid IPV6
-func (v *Validate) IPV6(name string, value string) {
+func (v *Validate) IPV6(key string, value string, message string) {
 
 	ip := net.ParseIP(value)
-	cond := ip != nil && len(ip) == 16
+	condition := ip != nil && len(ip) == 16
 
-	v.Validate(cond, "%s must be a valid IPV6 address", name)
+	v.Validate(key, condition, message, key, value)
+}
+
+// Pattern validates if string follow the desired pattern
+func (v *Validate) Pattern(key string, value string, pattern string, message string) {
+
+	regex := regexp.MustCompile(pattern)
+	condition := regex.MatchString(value)
+
+	v.Validate(key, condition, message, key, value, pattern)
 }
 
 // InList validates if string is in list of valid values
-func (v *Validate) InList(name string, value string, list []string) {
+func (v *Validate) InList(key string, value string, list []string, message string) {
 
 	len := len(list)
 	contains := false
@@ -119,5 +140,5 @@ func (v *Validate) InList(name string, value string, list []string) {
 		}
 	}
 
-	v.Validate(contains, "%s must be one of the options: %s", name, strings.Join(list, ", "))
+	v.Validate(key, contains, message, key, strings.Join(list, ", "), value)
 }

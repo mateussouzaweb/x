@@ -5,15 +5,24 @@ import (
 	"strings"
 )
 
-// Validate struct field validations, holds array of errors
-type Validate struct {
-	Errors []error
+// Error struct
+type Error struct {
+	Key     string
+	Message error
 }
 
-// Validate check condition, and appends error message to Validate instance if condition is not true
-func (v *Validate) Validate(cond bool, msg string, args ...interface{}) {
-	if !cond {
-		v.Errors = append(v.Errors, fmt.Errorf(msg, args...))
+// Validate struct validations, holds array of validation errors
+type Validate struct {
+	Errors []Error
+}
+
+// Validate checks condition and appends error message if condition is not true
+func (v *Validate) Validate(key string, condition bool, message string, args ...interface{}) {
+	if !condition {
+		v.Errors = append(v.Errors, Error{
+			Key:     key,
+			Message: fmt.Errorf(message, args...),
+		})
 	}
 }
 
@@ -33,7 +42,7 @@ func (v *Validate) Stringify() []string {
 	strErrors := make([]string, len(v.Errors))
 
 	for i, err := range v.Errors {
-		strErrors[i] = err.Error()
+		strErrors[i] = err.Message.Error()
 	}
 
 	return strErrors
