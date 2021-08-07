@@ -27,6 +27,10 @@ func Retrieve(document Document, filters *Array) error {
 	collection := document.TheCollection()
 	err := collection.FindOne(ctx, filters).Decode(document)
 
+	if err == mongo.ErrNoDocuments {
+		return nil
+	}
+
 	return err
 }
 
