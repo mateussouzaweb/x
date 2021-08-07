@@ -1,7 +1,6 @@
 package validation
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -17,11 +16,11 @@ type Validate struct {
 }
 
 // Validate checks condition and appends error message if condition is not true
-func (v *Validate) Validate(key string, condition bool, message string, args ...interface{}) {
+func (v *Validate) Validate(key string, condition bool, message error) {
 	if !condition {
 		v.Errors = append(v.Errors, Error{
 			Key:     key,
-			Message: fmt.Errorf(message, args...),
+			Message: message,
 		})
 	}
 }
