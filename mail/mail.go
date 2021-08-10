@@ -50,34 +50,32 @@ func (m *Mail) Delivery() error {
 
 	m.Fill()
 
-	var tmpl *template.Template
-	var err error
+	var body bytes.Buffer
 
-	tmpl, err = template.New("plain").Parse(m.Message)
+	content := m.Message
+	isHTML := strings.Contains(content, "</p>")
+
+	body.WriteString(fmt.Sprintf("To: %s\r\n"+
+		"From: %s <%s>\r\n"+
+		"Reply-To: %s\r\n"+
+		"Subject: %s\r\n",
+		m.To, m.From.Name, m.From.Email, m.ReplyTo, m.Subject))
+
+	if isHTML {
+		body.WriteString("MIME-version: 1.1\r\n" +
+			"Content-Type: text/html; charset=\"UTF-8\"\r\n" +
+			"\r\n")
+	} else {
+		body.WriteString("\r\n")
+	}
+
+	message, err := template.New("plain").Parse(content)
 
 	if err != nil {
 		return err
 	}
 
-	isHTML := strings.Contains(m.Message, "</p>")
-	content := fmt.Sprintf("To: %s\r\n"+
-		"From: %s <%s>\r\n"+
-		"Reply-To: %s\r\n"+
-		"Subject: %s\r\n",
-		m.To, m.From.Name, m.From.Email, m.ReplyTo, m.Subject)
-
-	if isHTML {
-		content += "MIME-version: 1.1\r\n" +
-			"Content-Type: text/html; charset=\"UTF-8\"\r\n" +
-			"\r\n"
-	} else {
-		content += "\r\n"
-	}
-
-	var body bytes.Buffer
-
-	body.Write([]byte(content))
-	tmpl.Execute(&body, m.Data)
+	message.Execute(&body, m.Data)
 
 	return _config.SMTP.Delivery(m, body.Bytes())
 }
