@@ -15,13 +15,18 @@ type Validate struct {
 	Errors []Error
 }
 
+// Add new error in validation errors list
+func (v *Validate) AddError(key string, message error) {
+	v.Errors = append(v.Errors, Error{
+		Key:     key,
+		Message: message,
+	})
+}
+
 // Validate checks condition and appends error message if condition is not true
 func (v *Validate) Validate(key string, condition bool, message error) {
 	if !condition {
-		v.Errors = append(v.Errors, Error{
-			Key:     key,
-			Message: message,
-		})
+		v.AddError(key, message)
 	}
 }
 
