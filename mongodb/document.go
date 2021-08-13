@@ -1,9 +1,6 @@
 package mongodb
 
 import (
-	"strings"
-
-	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -11,11 +8,6 @@ import (
 type Document interface {
 	TheUUID() string
 	TheCollection() *Collection
-}
-
-// UUID method
-func UUID() string {
-	return strings.ReplaceAll(uuid.New().String(), "-", "")
 }
 
 // Retrieve method
