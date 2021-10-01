@@ -10,29 +10,77 @@ type FindOptions = options.FindOptions
 
 // FindData struct
 type FindData struct {
-	Scope   Document
-	Filters *Array
-	Options *FindOptions
+	Collection *Collection
+	Filters    *Array
+	Options    *FindOptions
 }
 
 // Find method
-func Find(results interface{}, data FindData) error {
+func Find(data FindData, destination Results) error {
 
 	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
 
-	collection := data.Scope.TheCollection()
+	collection := data.Collection
 	cursor, err := collection.Find(ctx, data.Filters, data.Options)
 
 	if err != nil {
 		return err
 	}
 
-	if err := cursor.All(ctx, results); err != nil {
+	if err := cursor.All(ctx, destination); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+// FindOneOptions struct
+type FindOneOptions = options.FindOneOptions
+
+// FindOneData struct
+type FindOneData struct {
+	Collection *Collection
+	Filters    *Array
+	Options    *FindOneOptions
+}
+
+// FindOne method
+func FindOne(data FindOneData, destination Document) error {
+
+	ctx, cancel := Context(_config.OperationTimeout)
+	defer cancel()
+
+	collection := data.Collection
+	err := collection.FindOne(ctx, data.Filters, data.Options).Decode(destination)
+
+	if err == mongo.ErrNoDocuments {
+		return nil
+	}
+
+	return err
+}
+
+// FindOneByData struct
+type FindOneByData struct {
+	Collection *Collection
+	Key        string
+	Value      string
+	Options    *FindOneOptions
+}
+
+// FindOneBy method
+func FindOneBy(data FindOneByData, destination Document) error {
+
+	filters := Array{
+		Item{Key: data.Key, Value: data.Value},
+	}
+
+	return FindOne(FindOneData{
+		Collection: data.Collection,
+		Filters:    &filters,
+		Options:    data.Options,
+	}, destination)
 }
 
 // CountOptions struct
@@ -40,9 +88,9 @@ type CountOptions = options.CountOptions
 
 // CountData struct
 type CountData struct {
-	Scope   Document
-	Filters *Array
-	Options *CountOptions
+	Collection *Collection
+	Filters    *Array
+	Options    *CountOptions
 }
 
 // Count method
@@ -51,7 +99,7 @@ func Count(data CountData) (int64, error) {
 	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
 
-	collection := data.Scope.TheCollection()
+	collection := data.Collection
 	count, err := collection.CountDocuments(ctx, data.Filters, data.Options)
 
 	return count, err
@@ -62,25 +110,25 @@ type AggregateOptions = options.AggregateOptions
 
 // AggregateData struct
 type AggregateData struct {
-	Scope    Document
-	Pipeline *Pipeline
-	Options  *AggregateOptions
+	Collection *Collection
+	Pipeline   Pipeline
+	Options    *AggregateOptions
 }
 
 // Aggregate method
-func Aggregate(results interface{}, data AggregateData) error {
+func Aggregate(data AggregateData, destination Results) error {
 
 	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
 
-	collection := data.Scope.TheCollection()
-	cursor, err := collection.Aggregate(ctx, *data.Pipeline, data.Options)
+	collection := data.Collection
+	cursor, err := collection.Aggregate(ctx, data.Pipeline, data.Options)
 
 	if err != nil {
 		return err
 	}
 
-	if err := cursor.All(ctx, results); err != nil {
+	if err := cursor.All(ctx, destination); err != nil {
 		return err
 	}
 
@@ -92,45 +140,70 @@ type DistinctOptions = options.DistinctOptions
 
 // DistinctData struct
 type DistinctData struct {
-	Scope   Document
-	Field   string
-	Filters *Array
-	Options *DistinctOptions
+	Collection *Collection
+	Field      string
+	Filters    *Array
+	Options    *DistinctOptions
 }
 
 // Distinct method
-func Distinct(data DistinctData) ([]interface{}, error) {
+func Distinct(data DistinctData) (Results, error) {
 
 	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
 
-	collection := data.Scope.TheCollection()
+	collection := data.Collection
 	results, err := collection.Distinct(ctx, data.Field, data.Filters, data.Options)
 
 	return results, err
 }
 
-// CreateManyResult struct
-type CreateManyResult = mongo.InsertManyResult
+// InsertManyResult struct
+type InsertManyResult = mongo.InsertManyResult
 
-// CreateManyOptions struct
-type CreateManyOptions = options.InsertManyOptions
+// InsertManyOptions struct
+type InsertManyOptions = options.InsertManyOptions
 
-// CreateManyData struct
-type CreateManyData struct {
-	Scope     Document
-	Documents []interface{}
-	Options   *CreateManyOptions
+// InsertManyData struct
+type InsertManyData struct {
+	Collection *Collection
+	Documents  []Document
+	Options    *InsertManyOptions
 }
 
-// CreateMany method
-func CreateMany(data CreateManyData) (*CreateManyResult, error) {
+// InsertMany method
+func InsertMany(data InsertManyData) (*InsertManyResult, error) {
 
 	ctx, cancel := Context(_config.MassOperationTimeout)
 	defer cancel()
 
-	collection := data.Scope.TheCollection()
+	collection := data.Collection
 	result, err := collection.InsertMany(ctx, data.Documents, data.Options)
+
+	return result, err
+}
+
+// InsertResult struct
+type InsertResult = mongo.InsertOneResult
+
+// InsertOptions struct
+type InsertOptions = options.InsertOneOptions
+
+// InsertData struct
+type InsertData struct {
+	Collection *Collection
+	Document   Document
+	Options    *InsertOptions
+}
+
+// Insert method
+func Insert(data InsertData) (*InsertResult, error) {
+
+	ctx, cancel := Context(_config.OperationTimeout)
+	defer cancel()
+
+	collection := data.Collection
+	result, err := collection.InsertOne(ctx, data.Document, data.Options)
 
 	return result, err
 }
@@ -143,10 +216,10 @@ type UpdateManyOptions = options.UpdateOptions
 
 // UpdateManyData struct
 type UpdateManyData struct {
-	Scope   Document
-	Filters Array
-	Update  Array
-	Options *UpdateManyOptions
+	Collection *Collection
+	Filters    *Array
+	Updates    Document
+	Options    *UpdateManyOptions
 }
 
 // UpdateMany method
@@ -155,8 +228,42 @@ func UpdateMany(data UpdateManyData) (*UpdateManyResult, error) {
 	ctx, cancel := Context(_config.MassOperationTimeout)
 	defer cancel()
 
-	collection := data.Scope.TheCollection()
-	result, err := collection.UpdateMany(ctx, data.Filters, data.Update)
+	updates := Map{
+		"$set": data.Updates,
+	}
+
+	collection := data.Collection
+	result, err := collection.UpdateMany(ctx, data.Filters, updates, data.Options)
+
+	return result, err
+}
+
+// UpdateOneResult struct
+type UpdateResult = mongo.UpdateResult
+
+// UpdateOptions struct
+type UpdateOptions = options.UpdateOptions
+
+// UpdateData struct
+type UpdateData struct {
+	Collection *Collection
+	Filters    *Array
+	Updates    Document
+	Options    *UpdateOptions
+}
+
+// Update method
+func Update(data UpdateData) (*UpdateResult, error) {
+
+	ctx, cancel := Context(_config.OperationTimeout)
+	defer cancel()
+
+	updates := Map{
+		"$set": data.Updates,
+	}
+
+	collection := data.Collection
+	result, err := collection.UpdateOne(ctx, data.Filters, updates, data.Options)
 
 	return result, err
 }
@@ -169,9 +276,9 @@ type DeleteManyOptions = options.DeleteOptions
 
 // DeleteManyData struct
 type DeleteManyData struct {
-	Scope   Document
-	Filters *Array
-	Options *DeleteManyOptions
+	Collection *Collection
+	Filters    *Array
+	Options    *DeleteManyOptions
 }
 
 // DeleteMany method
@@ -180,8 +287,33 @@ func DeleteMany(data DeleteManyData) (*DeleteManyResult, error) {
 	ctx, cancel := Context(_config.MassOperationTimeout)
 	defer cancel()
 
-	collection := data.Scope.TheCollection()
+	collection := data.Collection
 	result, err := collection.DeleteMany(ctx, data.Filters, data.Options)
+
+	return result, err
+}
+
+// DeleteResult struct
+type DeleteResult = mongo.DeleteResult
+
+// DeleteOptions struct
+type DeleteOptions = options.DeleteOptions
+
+// DeleteData struct
+type DeleteData struct {
+	Collection *Collection
+	Filters    *Array
+	Options    *DeleteOptions
+}
+
+// Delete method
+func Delete(data DeleteData) (*DeleteResult, error) {
+
+	ctx, cancel := Context(_config.OperationTimeout)
+	defer cancel()
+
+	collection := data.Collection
+	result, err := collection.DeleteOne(ctx, data.Filters, data.Options)
 
 	return result, err
 }
