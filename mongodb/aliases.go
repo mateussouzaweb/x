@@ -19,9 +19,6 @@ type Collection = mongo.Collection
 // Document struct
 type Document = interface{}
 
-// Results struct
-type Results = []interface{}
-
 // == REPRESENTATIONS ==
 
 // List struct
