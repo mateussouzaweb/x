@@ -10,7 +10,7 @@ type FindOptions = options.FindOptions
 
 // FindData struct
 type FindData struct {
-	Collection *Collection
+	Collection string
 	Filters    *Array
 	Options    *FindOptions
 }
@@ -21,7 +21,7 @@ func Find(data FindData, destination Results) error {
 	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
 
-	collection := data.Collection
+	collection := GetCollection(data.Collection)
 	cursor, err := collection.Find(ctx, data.Filters, data.Options)
 
 	if err != nil {
@@ -40,7 +40,7 @@ type FindOneOptions = options.FindOneOptions
 
 // FindOneData struct
 type FindOneData struct {
-	Collection *Collection
+	Collection string
 	Filters    *Array
 	Options    *FindOneOptions
 }
@@ -51,7 +51,7 @@ func FindOne(data FindOneData, destination Document) error {
 	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
 
-	collection := data.Collection
+	collection := GetCollection(data.Collection)
 	err := collection.FindOne(ctx, data.Filters, data.Options).Decode(destination)
 
 	if err == mongo.ErrNoDocuments {
@@ -63,7 +63,7 @@ func FindOne(data FindOneData, destination Document) error {
 
 // FindOneByData struct
 type FindOneByData struct {
-	Collection *Collection
+	Collection string
 	Key        string
 	Value      string
 	Options    *FindOneOptions
@@ -88,7 +88,7 @@ type CountOptions = options.CountOptions
 
 // CountData struct
 type CountData struct {
-	Collection *Collection
+	Collection string
 	Filters    *Array
 	Options    *CountOptions
 }
@@ -99,7 +99,7 @@ func Count(data CountData) (int64, error) {
 	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
 
-	collection := data.Collection
+	collection := GetCollection(data.Collection)
 	count, err := collection.CountDocuments(ctx, data.Filters, data.Options)
 
 	return count, err
@@ -110,7 +110,7 @@ type AggregateOptions = options.AggregateOptions
 
 // AggregateData struct
 type AggregateData struct {
-	Collection *Collection
+	Collection string
 	Pipeline   Pipeline
 	Options    *AggregateOptions
 }
@@ -121,7 +121,7 @@ func Aggregate(data AggregateData, destination Results) error {
 	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
 
-	collection := data.Collection
+	collection := GetCollection(data.Collection)
 	cursor, err := collection.Aggregate(ctx, data.Pipeline, data.Options)
 
 	if err != nil {
@@ -140,7 +140,7 @@ type DistinctOptions = options.DistinctOptions
 
 // DistinctData struct
 type DistinctData struct {
-	Collection *Collection
+	Collection string
 	Field      string
 	Filters    *Array
 	Options    *DistinctOptions
@@ -152,7 +152,7 @@ func Distinct(data DistinctData) (Results, error) {
 	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
 
-	collection := data.Collection
+	collection := GetCollection(data.Collection)
 	results, err := collection.Distinct(ctx, data.Field, data.Filters, data.Options)
 
 	return results, err
@@ -166,7 +166,7 @@ type InsertManyOptions = options.InsertManyOptions
 
 // InsertManyData struct
 type InsertManyData struct {
-	Collection *Collection
+	Collection string
 	Documents  []Document
 	Options    *InsertManyOptions
 }
@@ -177,7 +177,7 @@ func InsertMany(data InsertManyData) (*InsertManyResult, error) {
 	ctx, cancel := Context(_config.MassOperationTimeout)
 	defer cancel()
 
-	collection := data.Collection
+	collection := GetCollection(data.Collection)
 	result, err := collection.InsertMany(ctx, data.Documents, data.Options)
 
 	return result, err
@@ -191,7 +191,7 @@ type InsertOptions = options.InsertOneOptions
 
 // InsertData struct
 type InsertData struct {
-	Collection *Collection
+	Collection string
 	Document   Document
 	Options    *InsertOptions
 }
@@ -202,7 +202,7 @@ func Insert(data InsertData) (*InsertResult, error) {
 	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
 
-	collection := data.Collection
+	collection := GetCollection(data.Collection)
 	result, err := collection.InsertOne(ctx, data.Document, data.Options)
 
 	return result, err
@@ -216,7 +216,7 @@ type UpdateManyOptions = options.UpdateOptions
 
 // UpdateManyData struct
 type UpdateManyData struct {
-	Collection *Collection
+	Collection string
 	Filters    *Array
 	Updates    Document
 	Options    *UpdateManyOptions
@@ -232,7 +232,7 @@ func UpdateMany(data UpdateManyData) (*UpdateManyResult, error) {
 		"$set": data.Updates,
 	}
 
-	collection := data.Collection
+	collection := GetCollection(data.Collection)
 	result, err := collection.UpdateMany(ctx, data.Filters, updates, data.Options)
 
 	return result, err
@@ -246,7 +246,7 @@ type UpdateOptions = options.UpdateOptions
 
 // UpdateData struct
 type UpdateData struct {
-	Collection *Collection
+	Collection string
 	Filters    *Array
 	Updates    Document
 	Options    *UpdateOptions
@@ -262,7 +262,7 @@ func Update(data UpdateData) (*UpdateResult, error) {
 		"$set": data.Updates,
 	}
 
-	collection := data.Collection
+	collection := GetCollection(data.Collection)
 	result, err := collection.UpdateOne(ctx, data.Filters, updates, data.Options)
 
 	return result, err
@@ -276,7 +276,7 @@ type DeleteManyOptions = options.DeleteOptions
 
 // DeleteManyData struct
 type DeleteManyData struct {
-	Collection *Collection
+	Collection string
 	Filters    *Array
 	Options    *DeleteManyOptions
 }
@@ -287,7 +287,7 @@ func DeleteMany(data DeleteManyData) (*DeleteManyResult, error) {
 	ctx, cancel := Context(_config.MassOperationTimeout)
 	defer cancel()
 
-	collection := data.Collection
+	collection := GetCollection(data.Collection)
 	result, err := collection.DeleteMany(ctx, data.Filters, data.Options)
 
 	return result, err
@@ -301,7 +301,7 @@ type DeleteOptions = options.DeleteOptions
 
 // DeleteData struct
 type DeleteData struct {
-	Collection *Collection
+	Collection string
 	Filters    *Array
 	Options    *DeleteOptions
 }
@@ -312,7 +312,7 @@ func Delete(data DeleteData) (*DeleteResult, error) {
 	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
 
-	collection := data.Collection
+	collection := GetCollection(data.Collection)
 	result, err := collection.DeleteOne(ctx, data.Filters, data.Options)
 
 	return result, err
