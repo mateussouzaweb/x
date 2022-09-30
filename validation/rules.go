@@ -2,6 +2,7 @@ package validation
 
 import (
 	"net"
+	"net/url"
 	"regexp"
 	"strings"
 	"time"
@@ -87,6 +88,15 @@ func (v *Validate) Domain(key string, value string, message error) {
 
 	regex := regexp.MustCompile(`^(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-z0-9])?\.)+(?:[a-zA-Z]{1,63}| xn--[a-z0-9]{1,59})$`)
 	condition := regex.MatchString(value)
+
+	v.Validate(key, condition, message)
+}
+
+// URL validates if URL is valid
+func (v *Validate) URL(key string, value string, message error) {
+
+	parse, err := url.Parse(value)
+	condition := err == nil && parse.Scheme != "" && parse.Host != ""
 
 	v.Validate(key, condition, message)
 }
