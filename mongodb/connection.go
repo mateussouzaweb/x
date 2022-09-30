@@ -15,10 +15,11 @@ var _config *Config
 
 // Config struct
 type Config struct {
-	URI                  string
-	Database             string
-	OperationTimeout     int64
-	MassOperationTimeout int64
+	URI                   string
+	Database              string
+	OperationTimeout      int64
+	MassOperationTimeout  int64
+	IndexOperationTimeout int64
 }
 
 // Context method

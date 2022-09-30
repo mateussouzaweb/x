@@ -317,3 +317,34 @@ func Delete(data DeleteData) (*DeleteResult, error) {
 
 	return result, err
 }
+
+// IndexOptions struct
+type IndexOptions = options.IndexOptions
+
+// IndexData struct
+type IndexData struct {
+	Collection string
+	Keys       Document
+	Options    *IndexOptions
+}
+
+// EnsureIndexes method
+func EnsureIndexes(data []IndexData) error {
+
+	ctx, cancel := Context(_config.IndexOperationTimeout)
+	defer cancel()
+
+	for _, item := range data {
+		indexView := GetCollection(item.Collection).Indexes()
+		_, err := indexView.CreateOne(ctx, mongo.IndexModel{
+			Keys:    item.Keys,
+			Options: item.Options,
+		}, &options.CreateIndexesOptions{})
+
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
