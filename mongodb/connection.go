@@ -68,6 +68,12 @@ func Connect(config *Config) error {
 	return nil
 }
 
+// Disconnect method
+func Disconnect() error {
+	ctx := context.Background()
+	return _client.Disconnect(ctx)
+}
+
 // GetClient method
 func GetClient() *Client {
 	return _client
