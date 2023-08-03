@@ -45,13 +45,13 @@ func (v *Validate) Time(key string, value time.Time, message error) {
 }
 
 // Slice validates presence of slice field
-func (v *Validate) Slice(key string, value []interface{}, message error) {
+func (v *Validate) Slice(key string, value []any, message error) {
 	condition := len(value) > 0
 	v.Validate(key, condition, message)
 }
 
 // Map validates presence of map field
-func (v *Validate) Map(key string, value map[interface{}]interface{}, message error) {
+func (v *Validate) Map(key string, value map[any]any, message error) {
 	condition := len(value) > 0
 	v.Validate(key, condition, message)
 }

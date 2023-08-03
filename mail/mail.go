@@ -15,7 +15,7 @@ type Address struct {
 }
 
 // Data type
-type Data = map[string]interface{}
+type Data = map[string]any
 
 // Mail struct
 type Mail struct {

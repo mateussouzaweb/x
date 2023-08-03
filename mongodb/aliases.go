@@ -17,7 +17,7 @@ type Database = mongo.Database
 type Collection = mongo.Collection
 
 // Document struct
-type Document = interface{}
+type Document = any
 
 // == REPRESENTATIONS ==
 

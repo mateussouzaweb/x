@@ -11,7 +11,7 @@ type ListIndexesData struct {
 }
 
 // ListIndexes method
-func ListIndexes(data ListIndexesData, destination interface{}) error {
+func ListIndexes(data ListIndexesData, destination any) error {
 
 	ctx, cancel := Context(_config.IndexOperationTimeout)
 	defer cancel()

@@ -16,7 +16,7 @@ type FindData struct {
 }
 
 // Find method
-func Find(data FindData, destination interface{}) error {
+func Find(data FindData, destination any) error {
 
 	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
@@ -116,7 +116,7 @@ type AggregateData struct {
 }
 
 // Aggregate method
-func Aggregate(data AggregateData, destination interface{}) error {
+func Aggregate(data AggregateData, destination any) error {
 
 	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
@@ -147,7 +147,7 @@ type DistinctData struct {
 }
 
 // Distinct method
-func Distinct(data DistinctData) ([]interface{}, error) {
+func Distinct(data DistinctData) ([]any, error) {
 
 	ctx, cancel := Context(_config.OperationTimeout)
 	defer cancel()
