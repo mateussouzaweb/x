@@ -7,10 +7,11 @@ import (
 	"text/template"
 )
 
-// From struct
-type From struct {
-	Email string
-	Name  string
+// Address struct
+type Address struct {
+	Reference string
+	Name      string
+	Email     string
 }
 
 // Data type
@@ -18,7 +19,7 @@ type Data = map[string]interface{}
 
 // Mail struct
 type Mail struct {
-	From    From
+	From    Address
 	To      string
 	ReplyTo string
 	Subject string
@@ -29,12 +30,6 @@ type Mail struct {
 // Fill method
 func (m *Mail) Fill() {
 
-	if m.From.Name == "" {
-		m.From.Name = _config.From.Name
-	}
-	if m.From.Email == "" {
-		m.From.Email = _config.From.Email
-	}
 	if m.ReplyTo == "" {
 		m.ReplyTo = m.From.Email
 	}
