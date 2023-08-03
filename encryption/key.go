@@ -1,8 +1,8 @@
 package encryption
 
 import (
+	"crypto/rand"
 	"encoding/hex"
-	"math/rand"
 )
 
 // GenerateKey create a random 32 bits key.

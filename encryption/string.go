@@ -3,9 +3,9 @@ package encryption
 import (
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"math/rand"
 )
 
 // EncryptString encode a string with the private key
