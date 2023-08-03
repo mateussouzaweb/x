@@ -78,7 +78,7 @@ func DecryptString(encrypted string) (string, error) {
 		return "", err
 	}
 
-	content := fmt.Sprintf("%s", decrypted)
+	content := string(decrypted)
 
 	return content, nil
 }
