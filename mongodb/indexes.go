@@ -18,7 +18,6 @@ func ListIndexes(data ListIndexesData, destination any) error {
 
 	indexes := GetCollection(data.Collection).Indexes()
 	cursor, err := indexes.List(ctx, &options.ListIndexesOptions{})
-
 	if err != nil {
 		return err
 	}

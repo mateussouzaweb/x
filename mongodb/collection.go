@@ -23,7 +23,6 @@ func Find(data FindData, destination any) error {
 
 	collection := GetCollection(data.Collection)
 	cursor, err := collection.Find(ctx, data.Filters, data.Options)
-
 	if err != nil {
 		return err
 	}
@@ -123,7 +122,6 @@ func Aggregate(data AggregateData, destination any) error {
 
 	collection := GetCollection(data.Collection)
 	cursor, err := collection.Aggregate(ctx, data.Pipeline, data.Options)
-
 	if err != nil {
 		return err
 	}

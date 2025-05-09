@@ -38,13 +38,11 @@ func Connect(config *Config) error {
 
 	clientOptions := options.Client().ApplyURI(config.URI)
 	client, err := mongo.Connect(ctx, clientOptions)
-
 	if err != nil {
 		return err
 	}
 
 	err = client.Ping(ctx, readpref.Primary())
-
 	if err != nil {
 		return err
 	}

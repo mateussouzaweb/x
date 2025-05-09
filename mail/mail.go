@@ -65,7 +65,6 @@ func (m *Mail) Delivery() error {
 	}
 
 	message, err := template.New("plain").Parse(content)
-
 	if err != nil {
 		return err
 	}
