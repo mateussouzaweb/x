@@ -19,16 +19,6 @@ func Set(variable string, value string) error {
 	return os.Setenv(variable, value)
 }
 
-// SetDefault places a default value if environment variable not have a value yet
-func SetDefault(variable string, value string) error {
-
-	if Get(variable, "") == "" {
-		return Set(variable, value)
-	}
-
-	return nil
-}
-
 // Unset a environment variable
 func Unset(variable string) error {
 	return os.Unsetenv(variable)
