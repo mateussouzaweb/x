@@ -33,23 +33,11 @@ func Context(timeout int64) (context.Context, context.CancelFunc) {
 // Connect method
 func Connect(config *Config) error {
 
-	clientOptions := options.Client().ApplyURI(config.URI)
-	client, err := mongo.NewClient(clientOptions)
-
-	if err != nil {
-		return err
-	}
-
 	ctx, cancel := Context(config.OperationTimeout)
 	defer cancel()
 
-	err = client.Connect(ctx)
-
-	// defer func() {
-	// 	if err = client.Disconnect(ctx); err != nil {
-	// 		log.Fatal(err)
-	// 	}
-	// }()
+	clientOptions := options.Client().ApplyURI(config.URI)
+	client, err := mongo.Connect(ctx, clientOptions)
 
 	if err != nil {
 		return err
