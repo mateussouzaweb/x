@@ -2,26 +2,27 @@ package env
 
 import (
 	"bufio"
+	"errors"
 	"os"
 	"strconv"
 	"strings"
 )
 
-// Load method
-func Load(filename string) error {
+// Load environment file and set runtime variables
+func LoadFile(filename string) error {
 
 	file, err := os.Open(filename)
-
 	if err != nil {
 		return err
 	}
 
-	defer file.Close()
+	defer func() {
+		errors.Join(err, file.Close())
+	}()
 
 	var lines []string
 
 	scanner := bufio.NewScanner(file)
-
 	for scanner.Scan() {
 		lines = append(lines, scanner.Text())
 	}
@@ -33,14 +34,12 @@ func Load(filename string) error {
 	for _, line := range lines {
 
 		variable, value, err := ReadLine(line)
-
 		if err != nil {
 			return err
 		}
 
 		if variable != "" {
-			err = Set(variable, value)
-
+			err = os.Setenv(variable, value)
 			if err != nil {
 				return err
 			}
@@ -51,13 +50,12 @@ func Load(filename string) error {
 	return nil
 }
 
-// ReadLine reads a variable entry line and returns the values
+// Reads a variable entry from line and returns the values
 func ReadLine(line string) (string, string, error) {
 
-	// Remove comments
-	if strings.Contains(line, "#") {
-		split := strings.SplitN(line, "#", 2)
-		line = split[0]
+	// Ignore if line starts with comments
+	if strings.HasPrefix(line, `#`) {
+		return "", "", nil
 	}
 
 	line = strings.TrimSpace(line)
@@ -72,10 +70,13 @@ func ReadLine(line string) (string, string, error) {
 	variable := pair[0]
 	value := pair[1]
 
-	value, err := strconv.Unquote(value)
-
-	if err != nil {
-		return "", "", err
+	// Unquote if necessary
+	if strings.ContainsAny(value, "\"'`") {
+		var err error
+		value, err = strconv.Unquote(value)
+		if err != nil {
+			return "", "", err
+		}
 	}
 
 	return variable, value, nil
